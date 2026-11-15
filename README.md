@@ -1,3 +1,6 @@
 # real-time voice call encryption and decryption
-## Library
+## Doc
+- ⁠https://www.geeksforgeeks.org/c/how-to-use-make-utility-to-build-c-projects/
 - https://github.com/cesanta/mongoose.git
+- https://mongoose.ws/documentation/tutorials/websocket/websocket-server/
+
