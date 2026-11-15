@@ -3,7 +3,12 @@ LIBS = -lpthread -lcrypto -L$(OPENSSL_PREFIX)/lib
 
 # crypto: src/crypto.c
 # 	gcc src/crypto.c -o crypto -Ilibrary -I$(OPENSSL_PREFIX)/include $(LIBS)
-
+test_room: tests/test_room.c src/room.c src/room.h
+	cc \
+		tests/test_room.c \
+		src/room.c \
+		-o test_room \
+		-Isrc
 
 main: src/main.c library/mongoose.c src/crypto.c
 	gcc src/main.c library/mongoose.c src/crypto.c -o main -Ilibrary -I$(OPENSSL_PREFIX)/include $(LIBS)
@@ -17,6 +22,9 @@ crypto_test: src/main.c src/crypto.c src/crypto.h
 		-I$(OPENSSL_PREFIX)/include \
 		-L$(OPENSSL_PREFIX)/lib \
 		-lcrypto
+
+
+
 
 
 # CC = gcc
