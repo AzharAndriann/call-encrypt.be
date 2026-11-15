@@ -14,5 +14,6 @@ typedef struct {
 Room *create_room(unsigned long client_id);
 Room *find_room_by_code(const char *code);
 Room *join_room(const char *code, unsigned long client_id);
+void remove_room(Room *room);
 
 #endif

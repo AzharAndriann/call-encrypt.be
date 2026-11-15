@@ -59,5 +59,22 @@ int main(void)
     printf("Join ke room yang tidak tersedia berhasil ditolak\n");
     printf("Semua tes room berhasil\n");
 
+    char old_code[ROOM_CODE_LENGTH + 1];
+    strcpy(old_code, room->code);
+
+    remove_room(room);
+    assert(room->active == 0);   
+    assert(room->client1_id == 0);   
+    assert(room->client2_id == 0);   
+    assert(room->code[0] == '\0');
+    
+    printf("Room berhasil dihapus\n");
+
+    Room *removed_room = find_room_by_code(old_code);
+    assert(removed_room == NULL);
+
+    printf("Kode room lama tidak dapat ditemukan\n");
+    printf("Semua room berhasil terhapus\n");
+
     return 0;
 }

@@ -61,3 +61,10 @@ Room *join_room(const char *code, unsigned long client_id){
 
   return rooms;
 }
+
+void remove_room(Room *room){
+  if (room == NULL){
+    return;
+  }
+  memset(room, 0, sizeof(*room));
+}
