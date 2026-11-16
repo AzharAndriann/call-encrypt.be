@@ -125,3 +125,127 @@ ws.onerror = (e) => console.log("Error:", e);
 
 
 make -f makefile.mk
+
+---
+
+## Cara Menjalankan Proyek di macOS dan Windows
+
+File `makefile.mk` tetap digunakan pada kedua sistem operasi. Perbedaannya hanya pada instalasi dependency dan nilai lokasi OpenSSL.
+
+### macOS
+
+#### 1. Install dependency
+
+Install Xcode Command Line Tools dan OpenSSL:
+
+```bash
+xcode-select --install
+brew install openssl
+```
+
+#### 2. Clone repository
+
+```bash
+git clone <URL_REPOSITORY>
+cd call-encrypt.be
+```
+
+#### 3. Build dan jalankan
+
+Tes room:
+
+```bash
+make -f makefile.mk test_room
+./test_room
+```
+
+Tes input dari `main.c`:
+
+```bash
+make -f makefile.mk main_input
+./build/main_input
+```
+
+Tes crypto:
+
+```bash
+make -f makefile.mk crypto_test
+./crypto_test
+```
+
+Tes memory leak menggunakan tool bawaan macOS:
+
+```bash
+leaks --atExit -- ./test_room
+```
+
+### Windows (WSL 2 + Ubuntu)
+
+Proyek ini menggunakan tool Unix/Linux seperti `make`, OpenSSL, dan Valgrind. Untuk pengguna Windows, gunakan WSL 2 dengan Ubuntu.
+
+#### 1. Install WSL dan Ubuntu
+
+Buka PowerShell sebagai Administrator:
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+Restart Windows jika diminta, lalu buka aplikasi Ubuntu. Panduan resmi: [Microsoft Learn - WSL](https://learn.microsoft.com/windows/wsl/setup/environment).
+
+#### 2. Install dependency di Ubuntu/WSL
+
+Jalankan perintah berikut di terminal Ubuntu, bukan PowerShell:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential libssl-dev pkg-config valgrind git
+```
+
+Dependency yang digunakan:
+
+- `build-essential`: compiler C dan `make`.
+- `libssl-dev`: header dan library OpenSSL.
+- `pkg-config`: membantu menemukan konfigurasi library.
+- `valgrind`: memeriksa memory leak.
+- `git`: clone repository.
+
+#### 3. Clone repository di filesystem WSL
+
+```bash
+cd ~
+git clone <URL_REPOSITORY>
+cd call-encrypt.be
+```
+
+Sebaiknya simpan repository di home WSL, bukan di `/mnt/c/`, agar proses build lebih cepat.
+
+#### 4. Build dan jalankan
+
+Makefile saat ini menggunakan lokasi OpenSSL dari Homebrew. Di WSL, override lokasinya menjadi `/usr`:
+
+```bash
+make -f makefile.mk OPENSSL_PREFIX=/usr test_room
+./test_room
+```
+
+Untuk mencoba input dari `main.c`:
+
+```bash
+make -f makefile.mk OPENSSL_PREFIX=/usr main_input
+./build/main_input
+```
+
+Untuk target crypto:
+
+```bash
+make -f makefile.mk OPENSSL_PREFIX=/usr crypto_test
+```
+
+#### 5. Tes memory leak
+
+```bash
+valgrind --leak-check=full --show-leak-kinds=all ./test_room
+```
+
+Cesanta Mongoose tidak perlu diunduh lagi karena `library/mongoose.c` dan `library/mongoose.h` sudah tersedia di repository. Node.js, npm, dan package npm `mongoose` juga tidak diperlukan untuk backend C saat ini.

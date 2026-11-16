@@ -1,18 +1,57 @@
 CC := cc
-OPENSSL_PREFIX := $(shell brew --prefix openssl)
+OS := $(shell uname -s)
+IS_WSL := $(shell if grep -qi microsoft /proc/version 2>/dev/null; then echo yes; else echo no; fi)
+
+ifeq ($(OS),Darwin)
+OPENSSL_PREFIX ?= $(shell brew --prefix openssl 2>/dev/null)
+else ifeq ($(IS_WSL),yes)
+OPENSSL_PREFIX ?= /usr
+endif
 
 CFLAGS := -Wall -Wextra -g
 COMMON_INCLUDES := -Isrc -Ilibrary
 OPENSSL_INCLUDES := -I$(OPENSSL_PREFIX)/include
 OPENSSL_LIBS := -L$(OPENSSL_PREFIX)/lib -lcrypto -lpthread
 
-.PHONY: all main main_input tests test_room crypto_test clean
+.PHONY: all setup main main_input tests test_room crypto_test clean
 
 # ============================================================
 # Default
 # ============================================================
 
 all: main
+
+# ============================================================
+# Dependency setup (macOS or Windows/WSL only)
+# Run: make -f makefile.mk setup
+# ============================================================
+
+setup:
+ifeq ($(OS),Darwin)
+	@echo "Menyiapkan dependency macOS..."
+	@if ! xcode-select -p >/dev/null 2>&1; then \
+		xcode-select --install; \
+	fi
+	@if ! command -v brew >/dev/null 2>&1; then \
+		echo "Homebrew belum terpasang: https://brew.sh"; \
+		exit 1; \
+	fi
+	brew install openssl
+	@echo "Setup macOS selesai."
+else ifeq ($(IS_WSL),yes)
+	@echo "Menyiapkan dependency Windows/WSL..."
+	sudo apt-get update
+	sudo apt-get install -y \
+		build-essential \
+		libssl-dev \
+		pkg-config \
+		valgrind \
+		git
+	@echo "Setup Windows/WSL selesai."
+else
+	@echo "Hanya macOS dan Windows/WSL yang didukung."
+	@exit 1
+endif
 
 # ============================================================
 # Application / server
