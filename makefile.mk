@@ -57,12 +57,13 @@ endif
 # Application / server
 # ============================================================
 
-main: src/main.c library/mongoose.c src/crypto.c src/crypto.h src/room.c src/room.h
+main: src/main.c src/server.c library/mongoose.c src/crypto.c src/crypto.h src/room.c src/room.h
 	$(CC) $(CFLAGS) \
 		src/main.c \
 		library/mongoose.c \
 		src/crypto.c \
 		src/room.c \
+		src/server.c \
 		-o main \
 		$(COMMON_INCLUDES) \
 		$(OPENSSL_INCLUDES) \
