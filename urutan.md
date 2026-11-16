@@ -114,7 +114,9 @@ Prinsipnya: **setiap modul dites sendiri-sendiri dulu sebelum digabung**, supaya
 
 
 const ws = new WebSocket("ws://localhost:8000/websocket");
-
+const ws = new WebSocket(
+  "wss://outskirts-equator-capricorn.ngrok-free.dev/websocket"
+);
 ws.onopen = () => {
   console.log("Terhubung!");
   ws.send("halo server");

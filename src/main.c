@@ -1,41 +1,36 @@
-// #include <stdio.h>
-// #include "mongoose.h"
+#include <stdio.h>
+#include "mongoose.h"
 
-// static const char *s_listen_on = "ws://localhost:8000";
+static const char *s_listen_on = "ws://localhost:8000";
 
-// static void fn(struct mg_connection *c, int ev, void *ev_data){
-//   if (ev == MG_EV_HTTP_MSG) {
-//     struct mg_http_message *hm = (struct mg_http_message *) ev_data;
-//     if (mg_match(hm->uri, mg_str("/websocket"), NULL)) {
-//       // Upgrade to websocket. From now on, connection is full-duplex
-//       // Websocket connection, which will receive MG_EV_WS_MSG events.
-//       mg_ws_upgrade(c, hm, NULL);
-//     } else if (mg_match(hm->uri, mg_str("/rest"), NULL)) {
-//       // Serve REST response
-//       mg_http_reply(c, 200, "", "{\"result\": %d}\n", 123);
-//     } else {
-//       // Serve static files
-//       mg_http_reply(c, 400, "", "{\"result\": %d}\n", 123);
-//     }
-//   } else if (ev == MG_EV_WS_MSG) {
-//     // Got websocket frame. Received data is wm->data. Echo it back!
-//     struct mg_ws_message *wm = (struct mg_ws_message *) ev_data;
-//     mg_ws_send(c, wm->data.buf, wm->data.len, WEBSOCKET_OP_TEXT);
-//   }
-// }
+static void fn(struct mg_connection *c, int ev, void *ev_data){
+  if (ev == MG_EV_HTTP_MSG) {
+    struct mg_http_message *hm = (struct mg_http_message *) ev_data;
+    if (mg_match(hm->uri, mg_str("/websocket"), NULL)) {
+      mg_ws_upgrade(c, hm, NULL);
+    } else if (mg_match(hm->uri, mg_str("/rest"), NULL)) {
+      mg_http_reply(c, 200, "", "{\"result\": %d}\n", 123);
+    } else {
+      mg_http_reply(c, 400, "", "{\"result\": %d}\n", 123);
+    }
+  } else if (ev == MG_EV_WS_MSG) {
+    struct mg_ws_message *wm = (struct mg_ws_message *) ev_data;
+    mg_ws_send(c, wm->data.buf, wm->data.len, WEBSOCKET_OP_TEXT);
+  }
+}
 
-// int main(void) {
-//   struct mg_mgr mgr;
-//   mg_mgr_init(&mgr);
+int main(void) {
+  struct mg_mgr mgr;
+  mg_mgr_init(&mgr);
 
-//   printf("Server jalan di %s/websocket\n", s_listen_on);
-//   mg_http_listen(&mgr, s_listen_on, fn, NULL);
+  printf("Server jalan di %s/websocket\n", s_listen_on);
+  mg_http_listen(&mgr, s_listen_on, fn, NULL);
 
-//   for (;;) mg_mgr_poll(&mgr, 1000);  // event loop, jalan terus
+  for (;;) mg_mgr_poll(&mgr, 1000); 
 
-//   mg_mgr_free(&mgr);
-//   return 0;
-// }
+  mg_mgr_free(&mgr);
+  return 0;
+}
 
 // #include <stdio.h>
 // #include <openssl/rand.h>
@@ -115,56 +110,56 @@
 // }
   
 
-#include<stdio.h>
-#include"room.h"
-int main (void){
-    unsigned long creator_id;
-    unsigned long joiner_id;
+// #include<stdio.h>
+// #include"room.h"
+// int main (void){
+//     unsigned long creator_id;
+//     unsigned long joiner_id;
 
-    char input_code[ROOM_CODE_LENGTH + 1];
+//     char input_code[ROOM_CODE_LENGTH + 1];
 
-    printf("Masukkan id pembuat room\n");
+//     printf("Masukkan id pembuat room\n");
     
-    if (scanf("%lu", &creator_id) != 1) {
-        printf("ID tidak valid\n");
-        return 1;
-    }
+//     if (scanf("%lu", &creator_id) != 1) {
+//         printf("ID tidak valid\n");
+//         return 1;
+//     }
 
-    Room *room = create_room(creator_id);
+//     Room *room = create_room(creator_id);
 
-    if (room == NULL) {
-        printf("gagal membuat room\n");
-        return 1;
-    }
+//     if (room == NULL) {
+//         printf("gagal membuat room\n");
+//         return 1;
+//     }
 
-    printf("room berhasil dibuat");
-    printf("room code %s\n", room->code);
+//     printf("room berhasil dibuat");
+//     printf("room code %s\n", room->code);
 
-    printf("masukkan client id yg ingin join : ");
+//     printf("masukkan client id yg ingin join : ");
 
-    if (scanf("%lu", &joiner_id) != 1) {
-        printf("kode tidak valid\n");
-        return 1;
-    }
+//     if (scanf("%lu", &joiner_id) != 1) {
+//         printf("kode tidak valid\n");
+//         return 1;
+//     }
 
-    printf("Masukkan kode room : ");
+//     printf("Masukkan kode room : ");
 
-    if (scanf("%6s", input_code) != 1) {
-        printf("kode tidak valid\n");
-        return 1;
-    }
+//     if (scanf("%6s", input_code) != 1) {
+//         printf("kode tidak valid\n");
+//         return 1;
+//     }
 
-    Room *joined = join_room(input_code, joiner_id);
+//     Room *joined = join_room(input_code, joiner_id);
 
-    if (joined == NULL){
-        printf("join gagal: room tidak ditemukan atau penuh\n");
-        return 1;
-    }
+//     if (joined == NULL){
+//         printf("join gagal: room tidak ditemukan atau penuh\n");
+//         return 1;
+//     }
 
-    printf("client %lu berhasil join \n", joiner_id);
-    printf("room %s\n", joined->code);
-    printf("client 1 : %lu\n", joined->client1_id);
-    printf("client 2 : %lu\n", joined->client2_id);
+//     printf("client %lu berhasil join \n", joiner_id);
+//     printf("room %s\n", joined->code);
+//     printf("client 1 : %lu\n", joined->client1_id);
+//     printf("client 2 : %lu\n", joined->client2_id);
 
-    return 0;
-}
+//     return 0;
+// }
