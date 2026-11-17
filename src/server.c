@@ -1,8 +1,32 @@
 #include<stdio.h>
 #include"mongoose.h"
 #include"server.h"
+#include"room.h"
 
 static const char *s_listen_on = "ws://localhost:8000";
+
+
+static void handle_create_room(struct mg_connection *c){
+  Room *room = create_room(c->id);
+
+  if(room == NULL){
+    mg_ws_printf(
+      c,
+      WEBSOCKET_OP_TEXT,
+      "{\"type\":\"error\","
+      "\"message\":\"gagal membuat room\"}"
+    );
+    return;
+  }
+
+  mg_ws_printf(
+    c,
+    WEBSOCKET_OP_TEXT,
+    "{\"type\":\"created\","
+    "\"code\":\"%s\"}",
+    room->code
+  );
+}
 
 static void fn(
   struct mg_connection *c,
@@ -28,19 +52,43 @@ static void fn(
               "Not found\n"
           );
       }
-  }
+  }  else if (ev == MG_EV_WS_MSG) {
+    struct mg_ws_message *wm = ev_data;
+    int opcode = wm->flags & 0x0F;
 
-  else if (ev == MG_EV_WS_MSG) {
-      struct mg_ws_message *wm = ev_data;
+    if (opcode == WEBSOCKET_OP_TEXT) {
+        char *type = mg_json_get_str(
+            wm->data,
+            "$.type"
+        );
 
-      mg_ws_send(
-          c,
-          wm->data.buf,
-          wm->data.len,
-          WEBSOCKET_OP_TEXT
-      );
+        if (type == NULL) {
+            mg_ws_printf(
+                c,
+                WEBSOCKET_OP_TEXT,
+                "{\"type\":\"error\","
+                "\"message\":\"type wajib diisi\"}"
+            );
+
+            return;
+        }
+
+        if (strcmp(type, "create_room") == 0) {
+            handle_create_room(c);
+        } else {
+            mg_ws_printf(
+                c,
+                WEBSOCKET_OP_TEXT,
+                "{\"type\":\"error\","
+                "\"message\":\"request tidak dikenal\"}"
+            );
+        }
+
+        mg_free(type);
+    }
   }
 }
+
 
 int start_server(void)
 {
