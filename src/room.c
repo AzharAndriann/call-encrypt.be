@@ -39,7 +39,6 @@ Room *find_room_by_code(const char *code){
       return &rooms[i];
     }
   }
-  printf("Room not found\n");
   return NULL;
 }
 

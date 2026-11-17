@@ -5,6 +5,23 @@
 
 static const char *s_listen_on = "ws://localhost:8000";
 
+static struct mg_connection *find_connection_by_id(
+    struct mg_mgr *mgr,
+    unsigned long client_id
+  ) {
+      struct mg_connection *connection = mgr->conns;
+
+      while (connection != NULL){
+        if (
+          connection->id == client_id &&
+          connection->is_websocket
+        ){
+          return connection;
+        }
+        connection = connection->next;
+      }
+      return NULL;
+    }
 
 static void handle_create_room(struct mg_connection *c){
   Room *room = create_room(c->id);
@@ -65,6 +82,22 @@ static void handle_join_room(struct mg_connection *c, struct mg_ws_message *wm) 
     "\"code\":\"%s\"}",
     room->code
   );  
+
+  struct mg_connection *creator =
+    find_connection_by_id(
+      c->mgr,
+      room->client1_id
+    );
+
+  if (creator != NULL) {
+    mg_ws_printf(
+      creator,
+      WEBSOCKET_OP_TEXT,
+      "{\"type\":\"peer_joined\","
+      "\"code\":\"%s\"}",
+      room->code
+    );  
+  }
 
   mg_free(code);  
 

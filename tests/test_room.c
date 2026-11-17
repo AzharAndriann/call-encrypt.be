@@ -1,80 +1,75 @@
-
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "room.h"
 
-int main(void)
+static void test_create_and_find_room(void)
 {
-    unsigned long client1_id = 1001;
-    unsigned long client2_id = 1002;
+    unsigned long creator_id = 1001;
+    Room *room = create_room(creator_id);
 
-    Room *room = create_room(client1_id);
     assert(room != NULL);
-
-    assert(room->client1_id == client1_id);
+    assert(room->client1_id == creator_id);
     assert(room->client2_id == 0);
     assert(room->active == 1);
     assert(strlen(room->code) == ROOM_CODE_LENGTH);
 
-    printf("Room berhasil dibuat\n");
-    printf("Kode room: %s\n", room->code);
-
     Room *found = find_room_by_code(room->code);
+    assert(found == room);
 
-    assert(found != NULL);
-    assert(strcmp(found->code, room->code) == 0);
+    Room *not_found = find_room_by_code("999999");
+    assert(not_found == NULL);
 
-    printf("Room ditemukan: %s\n", found->code);
+    printf("[OK] create dan find room\n");
+}
 
-    Room *not_found = find_room_by_code(room->code);
+static void test_join_room(void)
+{
+    unsigned long creator_id = 2001;
+    unsigned long joiner_id = 2002;
+    Room *room = create_room(creator_id);
 
-    // assert(not_found == NULL);
+    assert(room != NULL);
 
-    printf("Kode yang tidak valid berhasil ditolak\n");
-    printf("Semua tes room berhasil\n");
-
-    Room *joined = join_room(room->code, client2_id);
-    assert(joined != NULL);
+    Room *joined = join_room(room->code, joiner_id);
     assert(joined == room);
-    assert(joined->client2_id == client2_id);
+    assert(room->client2_id == joiner_id);
 
-    printf(
-        "Client %lu berhasil join room %s\n",
-        client2_id,
-        joined->code
-    );
+    assert(join_room(room->code, creator_id) == NULL);
+    assert(join_room(room->code, 2003) == NULL);
+    assert(join_room("999999", 2004) == NULL);
 
-    Room *third_client = join_room(room->code, 3003);
+    printf("[OK] join room dan penolakan client ketiga\n");
+}
 
-    assert(third_client == NULL);
-
-    printf("Client ketiga berhasil ditolak\n");
-
-    Room *invalid_room = join_room("999999", 4004);
-
-    assert(invalid_room == NULL);
-
-    printf("Join ke room yang tidak tersedia berhasil ditolak\n");
-    printf("Semua tes room berhasil\n");
-
+static void test_remove_room(void)
+{
+    Room *room = create_room(3001);
     char old_code[ROOM_CODE_LENGTH + 1];
+
+    assert(room != NULL);
     strcpy(old_code, room->code);
 
     remove_room(room);
-    assert(room->active == 0);   
-    assert(room->client1_id == 0);   
-    assert(room->client2_id == 0);   
+
+    assert(room->active == 0);
+    assert(room->client1_id == 0);
+    assert(room->client2_id == 0);
     assert(room->code[0] == '\0');
-    
-    printf("Room berhasil dihapus\n");
+    assert(find_room_by_code(old_code) == NULL);
 
-    Room *removed_room = find_room_by_code(old_code);
-    assert(removed_room == NULL);
+    remove_room(NULL);
 
-    printf("Kode room lama tidak dapat ditemukan\n");
-    printf("Semua room berhasil terhapus\n");
+    printf("[OK] remove room\n");
+}
 
+int main(void)
+{
+    test_create_and_find_room();
+    test_join_room();
+    test_remove_room();
+
+    printf("Semua tes room berhasil\n");
     return 0;
 }

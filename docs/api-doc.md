@@ -149,3 +149,28 @@ Jika nilai `type` tidak dikenali:
 - Jika backend dimatikan atau direstart, semua room akan hilang.
 - Satu room saat ini hanya dapat berisi dua user.
 - Fitur pengiriman audio belum dibahas dalam dokumentasi ini.
+
+
+window.wsA = new WebSocket(
+  "ws://outskirts-equator-capricorn.ngrok-free.dev/websocket"
+);
+
+wsA.onmessage = (event) => {
+  console.log("PESAN USER A:", event.data);
+};
+
+wsA.onerror = () => {
+  console.log("KONEKSI ERROR");
+};
+
+wsA.onclose = (event) => {
+  console.log("KONEKSI DITUTUP:", event.code);
+};
+
+wsA.onopen = () => {
+  console.log("KONEKSI TERBUKA");
+
+  wsA.send(JSON.stringify({
+    type: "create_room"
+  }));
+};

@@ -95,9 +95,9 @@ test_room: tests/test_room.c src/room.c src/room.h
 		-o test_room \
 		$(COMMON_INCLUDES)
 
-crypto_test: src/main.c src/crypto.c src/crypto.h
+crypto_test: tests/test_crypto.c src/crypto.c src/crypto.h
 	$(CC) $(CFLAGS) \
-		src/main.c \
+		tests/test_crypto.c \
 		src/crypto.c \
 		-o crypto_test \
 		$(COMMON_INCLUDES) \
