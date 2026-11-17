@@ -28,6 +28,48 @@ static void handle_create_room(struct mg_connection *c){
   );
 }
 
+static void handle_join_room(struct mg_connection *c, struct mg_ws_message *wm) {
+  char *code = mg_json_get_str(
+    wm->data,
+    "$.code"
+  );
+
+  if (code == NULL){
+      mg_ws_printf(
+        c,
+        WEBSOCKET_OP_TEXT,
+        "{\"type\":\"error\","
+          "\"message\":\"code wajib diisi\"}"
+      );
+    return;
+  }
+
+  Room *room = join_room(code, c->id);
+
+  if (room == NULL){
+    mg_ws_printf(
+      c,
+      WEBSOCKET_OP_TEXT,
+      "{\"type\":\"error\","
+        "\"message\":\"room tidak ditemukan atau penuh\"}"
+    );
+
+    mg_free(code);
+    return;
+  }
+
+  mg_ws_printf(
+    c,
+    WEBSOCKET_OP_TEXT,
+    "{\"type\":\"joined\","
+    "\"code\":\"%s\"}",
+    room->code
+  );  
+
+  mg_free(code);  
+
+}
+
 static void fn(
   struct mg_connection *c,
   int ev,
@@ -75,7 +117,10 @@ static void fn(
 
         if (strcmp(type, "create_room") == 0) {
             handle_create_room(c);
-        } else {
+        } else if (strcmp(type, "join_room") == 0) {
+          handle_join_room(c, wm);
+        }
+         else {
             mg_ws_printf(
                 c,
                 WEBSOCKET_OP_TEXT,
