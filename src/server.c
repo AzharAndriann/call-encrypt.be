@@ -152,8 +152,7 @@ static void fn(
             handle_create_room(c);
         } else if (strcmp(type, "join_room") == 0) {
           handle_join_room(c, wm);
-        }
-         else {
+        } else {
             mg_ws_printf(
                 c,
                 WEBSOCKET_OP_TEXT,
@@ -161,8 +160,56 @@ static void fn(
                 "\"message\":\"request tidak dikenal\"}"
             );
         }
-
         mg_free(type);
+    } else if (opcode == WEBSOCKET_OP_BINARY){
+      Room *room = find_room_by_client_id(c->id);
+
+      if (room == NULL){
+        mg_ws_printf(
+          c,
+          WEBSOCKET_OP_TEXT,
+          "{\"type\":\"error\","
+          "\"message\":\"client belum masuk room\"}"
+      );
+      return;
+      }
+
+      unsigned long peer_id;
+
+      if (room->client1_id == c->id){
+        peer_id = room->client2_id;
+      } else {
+        peer_id = room->client1_id;
+      }
+
+      if (peer_id == 0){
+        mg_ws_printf(
+          c,
+          WEBSOCKET_OP_TEXT,
+          "{\"type\":\"error\","
+          "\"message\":\"lawan bicara belum join\"}"
+      );
+      return;
+      }
+
+      struct mg_connection *peer = 
+        find_connection_by_id(c->mgr, peer_id);
+
+      if (peer == NULL) {
+        mg_ws_printf(
+          c,
+          WEBSOCKET_OP_TEXT,
+          "{\"type\":\"error\","
+          "\"message\":\"koneksi lawan tidak ditemukan\"}"
+      );
+      return;
+      }
+      mg_ws_send(
+        peer,
+        wm->data.buf,
+        wm->data.len,
+        WEBSOCKET_OP_BINARY
+    );
     }
   }
 }

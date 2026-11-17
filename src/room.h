@@ -13,6 +13,7 @@ typedef struct {
 
 Room *create_room(unsigned long client_id);
 Room *find_room_by_code(const char *code);
+Room *find_room_by_client_id( unsigned long client_id);
 Room *join_room(const char *code, unsigned long client_id);
 void remove_room(Room *room);
 

@@ -31,11 +31,25 @@ Room *find_room_by_code(const char *code){
     return NULL;
   }
   
-  for (int i = 0; i< MAX_ROOMS; i++){
+  for (int i = 0; i < MAX_ROOMS; i++){
     if (
       rooms[i].active && 
       strcmp(rooms[i].code, code) == 0 
     ) {
+      return &rooms[i];
+    }
+  }
+  return NULL;
+}
+
+Room *find_room_by_client_id(unsigned long client_id){
+  for (int i =0; i < MAX_ROOMS; i++ ){
+    if (
+      rooms[i].active && (
+        rooms[i].client1_id == client_id ||
+        rooms[i].client2_id == client_id 
+      ) 
+    ){
       return &rooms[i];
     }
   }

@@ -40,6 +40,10 @@ static void test_join_room(void)
     assert(join_room(room->code, 2003) == NULL);
     assert(join_room("999999", 2004) == NULL);
 
+    assert(find_room_by_client_id(creator_id) == room);
+    assert(find_room_by_client_id(joiner_id) == room);
+    assert(find_room_by_client_id(9999) == NULL);
+
     printf("[OK] join room dan penolakan client ketiga\n");
 }
 
