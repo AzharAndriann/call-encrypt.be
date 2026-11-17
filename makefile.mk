@@ -13,7 +13,7 @@ COMMON_INCLUDES := -Isrc -Ilibrary
 OPENSSL_INCLUDES := -I$(OPENSSL_PREFIX)/include
 OPENSSL_LIBS := -L$(OPENSSL_PREFIX)/lib -lcrypto -lpthread
 
-.PHONY: all setup main main_input tests test_room crypto_test clean
+.PHONY: all setup main main_input tests test_room test_packet crypto_test clean
 
 # ============================================================
 # Default
@@ -86,13 +86,20 @@ main_input: src/main.c src/room.c src/room.h
 # Unit tests
 # ============================================================
 
-tests: test_room crypto_test
+tests: test_room test_packet crypto_test
 
 test_room: tests/test_room.c src/room.c src/room.h
 	$(CC) $(CFLAGS) \
 		tests/test_room.c \
 		src/room.c \
 		-o test_room \
+		$(COMMON_INCLUDES)
+
+test_packet: tests/test_packet.c src/packet.c src/packet.h src/crypto.h
+	$(CC) $(CFLAGS) \
+		tests/test_packet.c \
+		src/packet.c \
+		-o test_packet \
 		$(COMMON_INCLUDES)
 
 crypto_test: tests/test_crypto.c src/crypto.c src/crypto.h
@@ -109,7 +116,7 @@ crypto_test: tests/test_crypto.c src/crypto.c src/crypto.h
 # ============================================================
 
 clean:
-	rm -f main test_room crypto_test
+	rm -f main test_room test_packet crypto_test
 	rm -f build/main_input
 
 # ============================================================

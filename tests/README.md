@@ -20,12 +20,20 @@ make -f makefile.mk crypto_test
 ./crypto_test
 ```
 
+## Tes packet
+
+Menguji pembuatan dan pembongkaran packet serta penolakan packet yang terlalu pendek.
+
+```bash
+make -f makefile.mk test_packet
+./test_packet
+```
+
 ## Menjalankan semua tes
 
 ```bash
 make -f makefile.mk tests
 ./test_room
+./test_packet
 ./crypto_test
 ```
-
-Tes packet belum dibuat karena format packet belum diimplementasikan.
