@@ -103,6 +103,39 @@ static void handle_join_room(struct mg_connection *c, struct mg_ws_message *wm) 
 
 }
 
+static void handle_disconnect(struct mg_connection *c){
+  Room *room = find_room_by_client_id(c->id);
+
+  if (room == NULL){
+    return;
+  }
+
+  unsigned long peer_id;
+
+  if (room->client1_id == c->id){
+    peer_id = room->client2_id;
+  } else {
+    peer_id = room->client1_id;
+  }
+
+  if (peer_id != 0){
+    struct mg_connection *peer = 
+      find_connection_by_id(c->mgr, peer_id);
+    
+    if (peer != NULL) {
+      mg_ws_printf(
+          peer,
+          WEBSOCKET_OP_TEXT,
+          "{\"type\":\"peer_left\","
+          "\"code\":\"%s\"}",
+          room->code
+      );
+    }
+  }
+
+  remove_room(room);
+}
+
 static void fn(
   struct mg_connection *c,
   int ev,
@@ -203,13 +236,15 @@ static void fn(
           "\"message\":\"koneksi lawan tidak ditemukan\"}"
       );
       return;
-      }
+      } 
       mg_ws_send(
         peer,
         wm->data.buf,
         wm->data.len,
         WEBSOCKET_OP_BINARY
-    );
+      );
+    } else if (ev == MG_EV_CLOSE) {
+      handle_disconnect(c);
     }
   }
 }
