@@ -243,9 +243,9 @@ static void fn(
         wm->data.len,
         WEBSOCKET_OP_BINARY
       );
-    } else if (ev == MG_EV_CLOSE) {
-      handle_disconnect(c);
-    }
+    } 
+  } else if (ev == MG_EV_CLOSE) {
+    handle_disconnect(c);
   }
 }
 

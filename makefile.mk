@@ -110,6 +110,18 @@ crypto_test: tests/test_crypto.c src/crypto.c src/crypto.h
 		$(COMMON_INCLUDES) \
 		$(OPENSSL_INCLUDES) \
 		$(OPENSSL_LIBS)
+		
+crypto_packet_test: tests/test_crypto_packet.c \
+	src/crypto.c src/crypto.h \
+	src/packet.c src/packet.h
+	$(CC) $(CFLAGS) \
+		tests/test_crypto_packet.c \
+		src/crypto.c \
+		src/packet.c \
+		-o crypto_packet_test \
+		$(COMMON_INCLUDES) \
+		$(OPENSSL_INCLUDES) \
+		$(OPENSSL_LIBS)
 
 # ============================================================
 # Cleanup (only runs when explicitly requested)

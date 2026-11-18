@@ -251,3 +251,6 @@ valgrind --leak-check=full --show-leak-kinds=all ./test_room
 ```
 
 Cesanta Mongoose tidak perlu diunduh lagi karena `library/mongoose.c` dan `library/mongoose.h` sudah tersedia di repository. Node.js, npm, dan package npm `mongoose` juga tidak diperlukan untuk backend C saat ini.
+
+
+- leaks --atExit -- ./crypto_packet_test
