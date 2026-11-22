@@ -1,0 +1,13 @@
+.git
+.gitignore
+build
+main
+test_room
+test_packet
+crypto_test
+crypto_packet_test
+*.o
+*.log
+.DS_Store
+docs
+screenshot

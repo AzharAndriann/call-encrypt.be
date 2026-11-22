@@ -48,7 +48,7 @@ static void test_encrypt_and_decrypt(void)
     assert(decrypted_len == (int)strlen((const char *)plaintext));
     assert(memcmp(decrypted, plaintext, (size_t)decrypted_len) == 0);
 
-    printf("[OK] encrypt dan decrypt\n");
+    printf("encrypt dan decrypt\n");
 }
 
 static void test_modified_ciphertext_is_rejected(void)
@@ -82,13 +82,52 @@ static void test_modified_ciphertext_is_rejected(void)
 
     assert(decrypted_len < 0);
 
-    printf("[OK] ciphertext yang diubah berhasil ditolak\n");
+    printf("ciphertext yang diubah berhasil ditolak\n");
+}
+
+static void test_wrong_key_is_rejected(void)
+{
+    const unsigned char plaintext[] = "halo";
+
+    unsigned char ciphertext[TEST_BUFFER_SIZE];
+    unsigned char decrypted[TEST_BUFFER_SIZE];
+    unsigned char tag[TAG_SIZE];
+
+    unsigned char wrong_key[KEY_SIZE];
+
+    memcpy(wrong_key, test_key, KEY_SIZE);
+    wrong_key[0] ^= 0x01;
+
+    int ciphertext_len = crypto_encrypt(
+        plaintext,
+        (int)strlen((const char *)plaintext),
+        test_key,
+        test_nonce,
+        ciphertext,
+        tag
+    );
+
+    assert(ciphertext_len > 0);
+
+    int decrypted_len = crypto_decrypt(
+        ciphertext,
+        ciphertext_len,
+        wrong_key,
+        test_nonce,
+        tag,
+        decrypted
+    );
+
+    assert(decrypted_len < 0);
+
+    printf("dekripsi dengan key salah berhasil ditolak\n");
 }
 
 int main(void)
 {
     test_encrypt_and_decrypt();
     test_modified_ciphertext_is_rejected();
+    test_wrong_key_is_rejected();
 
     printf("Semua tes crypto berhasil\n");
     return 0;

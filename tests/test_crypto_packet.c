@@ -102,8 +102,6 @@ int main(void)
 
     packet[SEQUENCE_SIZE + NONCE_SIZE] ^= 0x01;
 
-    // test ubah
-    // Pelajaran pentingnya: jika crypto_decrypt() menghasilkan < 0, isi output harus langsung diabaikan karena autentikasi tag gagal.
     int tampered_result = crypto_decrypt(
         parsed_ciphertext,
         (int)parsed_ciphertext_len,
@@ -115,11 +113,11 @@ int main(void)
 
     assert(tampered_result < 0);
 
-    printf("[OK] packet yang diubah berhasil ditolak\n");
+    printf(" packet yang diubah berhasil ditolak\n");
 
     free(packet);
 
-    printf("[OK] crypto dan packet berhasil terhubung\n");
+    printf(" crypto dan packet berhasil terhubung\n");
     printf("Hasil decrypt: %.*s\n", decrypted_len, decrypted);
 
     return 0;

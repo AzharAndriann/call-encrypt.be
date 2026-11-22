@@ -3,7 +3,6 @@
 #include"server.h"
 #include"room.h"
 
-static const char *s_listen_on = "ws://localhost:8000";
 
 static struct mg_connection *find_connection_by_id(
     struct mg_mgr *mgr,
@@ -253,25 +252,43 @@ static void fn(
 int start_server(void)
 {
     struct mg_mgr mgr;
+    const char *port = getenv("PORT");
+    char listen_address[64];
+
+    if (port == NULL) {
+        port = "8000";
+    }
+
+    snprintf(
+        listen_address,
+        sizeof(listen_address),
+        "http://0.0.0.0:%s",
+        port
+    );
 
     mg_mgr_init(&mgr);
 
     if (
         mg_http_listen(
             &mgr,
-            s_listen_on,
+            listen_address,
             fn,
             NULL
         ) == NULL
     ) {
-        fprintf(stderr, "Gagal menjalankan server\n");
+        fprintf(
+            stderr,
+            "Gagal menjalankan server di %s\n",
+            listen_address
+        );
+
         mg_mgr_free(&mgr);
         return 1;
     }
 
     printf(
-        "Server jalan di "
-        "ws://localhost:8000/websocket\n"
+        "Server berjalan di %s/websocket\n",
+        listen_address
     );
 
     for (;;) {

@@ -21,7 +21,7 @@ static void test_create_and_find_room(void)
     Room *not_found = find_room_by_code("999999");
     assert(not_found == NULL);
 
-    printf("[OK] create dan find room\n");
+    printf("create dan find room\n");
 }
 
 static void test_join_room(void)
@@ -44,7 +44,7 @@ static void test_join_room(void)
     assert(find_room_by_client_id(joiner_id) == room);
     assert(find_room_by_client_id(9999) == NULL);
 
-    printf("[OK] join room dan penolakan client ketiga\n");
+    printf("join room dan penolakan client ketiga\n");
 }
 
 static void test_remove_room(void)
@@ -65,7 +65,7 @@ static void test_remove_room(void)
 
     remove_room(NULL);
 
-    printf("[OK] remove room\n");
+    printf("remove room\n");
 }
 
 int main(void)

@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,7 +94,7 @@ static void test_create_and_parse_packet(void)
 
     free(packet);
 
-    printf("[OK] create dan parse packet\n");
+    printf("create dan parse packet\n");
 }
 
 static void test_packet_too_short(void)
@@ -120,7 +119,7 @@ static void test_packet_too_short(void)
 
     assert(result < 0);
 
-    printf("[OK] packet terlalu pendek ditolak\n");
+    printf("packet terlalu pendek ditolak\n");
 }
 
 int main(void)
